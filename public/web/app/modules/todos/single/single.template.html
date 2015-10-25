@@ -1,0 +1,33 @@
+<p>This is the single view.</p>
+
+<h1 ng-show="todosSingle.isLoading">View is syncing</h1>
+
+<form novalidate ng-submit="todosSingle.saveTodo()" name="todoForm">
+
+    <input type="text"
+           name="todoForm.title"
+           ng-model="todosSingle.todo.title"
+           required/>
+    
+    <textarea name="todoText.text"
+              ng-model="todosSingle.todo.text"
+              cols="30" rows="10"></textarea>
+    
+    <input type="checkbox"
+           ng-model="todosSingle.todo.completed"/>
+
+    <button type="submit">
+        Save
+    </button>
+
+    <button type="button"
+            class="alert"
+            ng-click="todosSingle.deleteTodo()"
+            ng-if="todosSingle.isEditTodo">
+        Delete
+    </button>
+
+    <a class="button" ui-sref="application.todos.list">
+        Cancel
+    </a>
+</form>

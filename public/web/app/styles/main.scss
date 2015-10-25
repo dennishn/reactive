@@ -85,4 +85,9 @@
 // Modules
 @import "../modules/_application/application";
 @import "../modules/index/index";
+@import "../app\modules\todos\todos";
+@import "../app\modules\todos\single\single";
+@import "../app\modules\todos\create\create";
+@import "../app\modules\todos\list\list";
+@import "../app\modules\todos\delete\delete";
 /* ---> Do not delete this comment (Modules) <--- */

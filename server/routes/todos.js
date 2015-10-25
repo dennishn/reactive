@@ -61,7 +61,9 @@ function updateTodo(res, id, todo) {
 
 	Todo.findById(id, function(err, _todo) {
 
+		_todo.title = todo.title;
 		_todo.text = todo.text;
+		_todo.completed = todo.completed;
 
 		_todo.save(function(err) {
 
@@ -105,7 +107,8 @@ function bulkCreate(res, count) {
 	for(var i = 0; i < count; i++) {
 
 		var _todo = {
-			text: Faker.Lorem.sentence(),
+			title: Faker.Lorem.sentence(),
+			text: Faker.Lorem.paragraphs(),
 			completed: false
 		};
 

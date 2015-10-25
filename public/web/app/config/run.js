@@ -17,7 +17,7 @@
 		var didRunTranslate = false;
 
 		$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-
+			console.table(toState);
 			if(!didRunTranslate) {
 
 

@@ -1,5 +1,5 @@
 (function () {
 	'use strict';
 
-	angular.module('TodosService', []);
+	angular.module('TodosModelService', []);
 })();

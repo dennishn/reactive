@@ -2,11 +2,11 @@
 	'use strict';
 
 	angular
-		.module('index')
-		.controller('Index', Index);
+		.module('todos')
+		.controller('TodosCreateController', TodosCreateController);
 
 	/* @ngInject */
-	function Index() {
+	function TodosCreateController() {
 		/*jshint validthis: true */
 		var vm = this;
 

@@ -26,11 +26,12 @@
 			'ngTouch',
 			'ngStorage',
 			'btford.socket-io',
+			'ngLodash',
 			'nvd3',
 			'application',
-			'index',
 			'socket',
-			'TodosService',
+			'TodosModelService',
+			'todos',
 			/* ---> Do not delete this comment (ngImports) <--- */
 	]);
 })();

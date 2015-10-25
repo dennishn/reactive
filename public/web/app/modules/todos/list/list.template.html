@@ -1,0 +1,34 @@
+Her er tod-list
+<a class="button" ui-sref="application.todos.single">
+    Create
+</a>
+<h1 ng-show="todosList.isLoading">View is syncing</h1>
+<ul>
+    <li ng-repeat="todo in todosList.todos track by todo._id">
+        <input type="checkbox"
+               ng-model="todo.completed"
+               ng-change="todosList.updateTodo(todo)"/>
+        <p ng-show="todo.isSyncing">
+            is syncing? {{todo.isSyncing}}
+        </p>
+        <a ui-sref="application.todos.single({'id': todo._id})">
+            {{todo.title}}
+        </a>
+        <button class="alert" ng-click="todosList.deleteTodo(todo)">
+            Delete
+        </button>
+    </li>
+</ul>
+<div class="row">
+    <div class="small-12 columns">
+        <h2>DENNIS DU SKAL:</h2>
+        <ul>
+            <li>
+                Finde et system ala lodash-konceptet, fordi: skal kunne finde noget i min interne collection og opdatere det på baggrund af WS
+            </li>
+            <li>
+                kunne være nice at det ikke er JS data etc, men er et hjemme lavet simpelt system...
+            </li>
+        </ul>
+    </div>
+</div>
