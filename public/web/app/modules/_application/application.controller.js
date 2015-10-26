@@ -6,7 +6,7 @@
 		.controller('Application', Application);
 
 	/* @ngInject */
-	function Application(Socket, TodosService, $scope) {
+	function Application(TodosService, $scope) {
 		/*jshint validthis: true */
 		var vm = this;
 
@@ -37,26 +37,26 @@
 			}
 		};
 
-		Socket.on('connection_established', function(message) {
-			console.info('io msg: ', message);
-			vm.isConnected = true;
-		});
-
-		Socket.on('stream', function(data) {
-
-			$scope.chart.push(data);
-			console.log($scope.chart)
-		});
+		//Socket.on('connection_established', function(message) {
+		//	console.info('io msg: ', message);
+		//	vm.isConnected = true;
+		//});
+		//
+		//Socket.on('stream', function(data) {
+		//
+		//	$scope.chart.push(data);
+		//	console.log($scope.chart)
+		//});
 
 		vm.establishStream = function() {
 
-			Socket.emit('poll_stream');
+			//Socket.emit('poll_stream');
 
 		};
 
 		vm.cancelStream = function() {
 
-			Socket.emit('cancel_stream');
+			//Socket.emit('cancel_stream');
 
 		};
 

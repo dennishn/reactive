@@ -6,7 +6,7 @@
 		.controller('TodosSingleController', TodosSingleController);
 
 	/* @ngInject */
-	function TodosSingleController(TodosService, TodoFactory, todoId, $state) {
+	function TodosSingleController(Socket, TodosService, TodoFactory, todoId, $state) {
 		/*jshint validthis: true */
 		var vm = this;
 
@@ -92,6 +92,7 @@
 		}
 
 		function _succesStateHandler() {
+			Socket.emit('todos:pullList', true);
 			$state.go('application.todos.list');
 		}
 	}

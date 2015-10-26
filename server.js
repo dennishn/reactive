@@ -4,6 +4,7 @@ var app		= express();
 var server	= require('http').Server(app);
 var io		= require('socket.io')(server);
 require('./server/config/sockets')(io);
+require('./server/streams/todo')(io);
 
 var mongoose = require('mongoose');
 var database = require('./server/config/database');
