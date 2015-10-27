@@ -5,7 +5,7 @@
     Create
 </a>
 <h1 ng-show="todosList.isLoading">View is syncing</h1>
-<ul>
+<ul class="todos">
     <li ng-repeat="todo in todosList.todos track by todo._id">
         <input type="checkbox"
                ng-model="todo.completed"

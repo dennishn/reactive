@@ -28,6 +28,7 @@
 			'btford.socket-io',
 			'ngLodash',
 			'nvd3',
+			'rx',
 			'application',
 			'socket',
 			'TodosModelService',

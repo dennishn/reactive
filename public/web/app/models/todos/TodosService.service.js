@@ -6,7 +6,7 @@
 		.service('TodosService', TodosService);
 
 	/* @ngInject */
-	function TodosService($http, $q, lodash, TodoFactory) {
+	function TodosService($http, $q, lodash, TodoFactory, Socket) {
 		/*jshint validthis: true */
 
 		var baseUrl = 'http://localhost:8080/api/todos';
@@ -16,8 +16,49 @@
 			getSingle: getSingle,
 			create: create,
 			update: update,
-			remove: remove
+			remove: remove,
+			collection: []
 		};
+
+		Socket.on('todos:pushSingle', function(todo) {
+			console.info('Recieving from Server - todos:pushSingle');
+
+			var keepGoing = true;
+
+			for(var i = 0, l = service.collection.length; i < l; i++) {
+				if(keepGoing) {
+					if(service.collection[i]._id === todo._id) {
+						console.info('Record found - updating');
+						service.collection[i] = todo;
+						keepGoing = false;
+					}
+				}
+
+			}
+
+			if(keepGoing) {
+				console.info('Record not found - pushing to collection');
+				service.collection.push(todo);
+			}
+		});
+
+		Socket.on('todos:pushList', function(todos) {
+			console.info('Recieving from Server - todos:pushList');
+
+			service.collection = todos;
+		});
+
+		Socket.on('todos:retractSingle', function(id) {
+			console.info('Recieving from Server - todos:retractSingle');
+
+			for(var i = 0, l = service.collection.length; i < l; i++) {
+				if(service.collection[i]._id === id) {
+					console.info('Record found - updating');
+					service.collection.splice(i, 1);
+				}
+			}
+
+		});
 
 		return service;
 
@@ -27,7 +68,8 @@
 
 			$http.get(baseUrl)
 				.then(function getTodosListSuccess(results) {
-					deferred.resolve(results.data);
+					service.collection = results.data;
+					deferred.resolve(service.collection);
 				})
 				.catch(function getTodosListError(err) {
 					deferred.reject(err);
@@ -98,6 +140,10 @@
 				});
 
 			return deferred.promise;
+
+		}
+
+		function _findById(id) {
 
 		}
 	}

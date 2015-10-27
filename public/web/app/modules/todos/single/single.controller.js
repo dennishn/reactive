@@ -92,7 +92,7 @@
 		}
 
 		function _succesStateHandler() {
-			Socket.emit('todos:pullList', true);
+			//Socket.emit('todos:pullList', true);
 			$state.go('application.todos.list');
 		}
 	}

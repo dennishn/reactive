@@ -3,8 +3,8 @@ var express = require('express');
 var app		= express();
 var server	= require('http').Server(app);
 var io		= require('socket.io')(server);
-require('./server/config/sockets')(io);
-require('./server/streams/todo')(io);
+//require('./server/config/sockets')(io);
+//require('./server/streams/todo')(io);
 
 var mongoose = require('mongoose');
 var database = require('./server/config/database');
@@ -38,7 +38,7 @@ app.all('*', function(req, res, next) {
 	}
 });
 
-require('./server/routes/todos.js')(app);
+require('./server/routes/todos.js')(app, io);
 
 server.listen(port);
 console.log('Express listening on port: ', port);

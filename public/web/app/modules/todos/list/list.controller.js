@@ -6,7 +6,7 @@
 		.controller('TodosListController', TodosListController);
 
 	/* @ngInject */
-	function TodosListController(TodosService, Socket) {
+	function TodosListController(TodosService, Socket, $scope) {
 		/*jshint validthis: true */
 		var vm = this;
 
@@ -18,12 +18,11 @@
 		vm.updateTodo = updateTodo;
 		vm.deleteTodo = deleteTodo;
 
-		vm.pullList = function() {
-			console.log('Emitting from Controller');
-			Socket.emit('todos:pullList', true);
-		};
-		Socket.on('todos:pushList', function(todos) {
-			_successStateHandler(todos);
+		$scope.$watchCollection(function() {
+			return TodosService.collection;
+		}, function(newCollection, oldCollection) {
+			console.log('collection updated through a watcher')
+			vm.todos = newCollection;
 		});
 
 		activate();

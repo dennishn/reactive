@@ -7,7 +7,6 @@
  * - Add defensive checks to methods
  * - Add query parameters / filters
  * - Add bulk endpoints for manipulating [0-N] documents
- * - Expand the Todo model with more fields
  *
  */
 
@@ -41,7 +40,7 @@ function getTodo(res, id) {
 
 }
 
-function createTodo(res, todo) {
+function createTodo(res, socket, todo) {
 
 	var _todo = new Todo(todo);
 
@@ -52,12 +51,13 @@ function createTodo(res, todo) {
 		}
 
 		res.json(_todo);
+		_emitSingle(socket, _todo);
 
 	});
 
 }
 
-function updateTodo(res, id, todo) {
+function updateTodo(res, socket, id, todo) {
 
 	Todo.findById(id, function(err, _todo) {
 
@@ -71,6 +71,7 @@ function updateTodo(res, id, todo) {
 				res.send(err);
 			}
 
+			_emitSingle(socket, _todo);
 			res.send(_todo);
 
 		});
@@ -79,7 +80,7 @@ function updateTodo(res, id, todo) {
 
 }
 
-function deleteTodo(res, id) {
+function deleteTodo(res, socket, id) {
 
 	return Todo.findById(id, function (err, todo) {
 
@@ -89,11 +90,40 @@ function deleteTodo(res, id) {
 				res.send(err);
 			}
 
+			_retractSingle(socket, id);
 			res.send('');
 
 		});
 	});
 
+}
+
+function _emitSingle(socket, todo) {
+	_emit(socket, 'pushSingle', todo, true);
+}
+
+function _emitList(socket) {
+	Todo.find(function() {
+		_emit(socket, 'pushList', true);
+	});
+}
+
+function _retractSingle(socket, id) {
+	_emit(socket, 'retractSingle', id, true);
+}
+
+function _retractList(socket) {
+	_emit(socket, 'retractList', '', true);
+}
+
+function _emit(socket, eventName, payload, isBroadcast) {
+	if(isBroadcast) {
+		// to other sockets (clientA > server > clientB)
+		socket.broadcast.emit('todos:' + eventName, payload);
+	} else {
+		// to own socket (clientA > server > clientA)
+		socket.emit('todos:' + eventName, payload);
+	}
 }
 
 /*
@@ -143,7 +173,13 @@ function bulkDelete(res) {
 
 }
 
-module.exports = function(app) {
+module.exports = function(app, io) {
+
+	var _socket;
+
+	io.on('connection', function(socket) {
+		_socket = socket;
+	});
 
 	app.get('/api/todos', function(req, res) {
 
@@ -159,19 +195,19 @@ module.exports = function(app) {
 
 	app.post('/api/todos', function(req, res) {
 
-		createTodo(res, req.body);
+		createTodo(res, _socket, req.body);
 
 	});
 
 	app.put('/api/todos/:todo_id', function(req, res) {
 
-		updateTodo(res, req.params.todo_id, req.body);
+		updateTodo(res, _socket, req.params.todo_id, req.body);
 
 	});
 
 	app.delete('/api/todos/:todo_id', function(req, res) {
 
-		deleteTodo(res, req.params.todo_id);
+		deleteTodo(res, _socket, req.params.todo_id);
 
 	});
 
