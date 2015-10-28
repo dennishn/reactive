@@ -20,8 +20,8 @@
 
 		$scope.$watchCollection(function() {
 			return TodosService.collection;
-		}, function(newCollection, oldCollection) {
-			console.log('collection updated through a watcher')
+		}, function(newCollection) {
+			console.info('Collection updated through watcher');
 			vm.todos = newCollection;
 		});
 
@@ -40,7 +40,6 @@
 			_loadingStateHandler();
 
 			_updateTodo(todo)
-				.then(_getTodos)
 				.then(_successStateHandler)
 				.catch(_errorHandler)
 				.finally(function() {
@@ -82,8 +81,8 @@
 			vm.isLoading = !vm.isLoading;
 		}
 
-		function _successStateHandler(todos) {
-			vm.todos = todos;
+		function _successStateHandler() {
+
 		}
 	}
 

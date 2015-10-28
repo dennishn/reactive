@@ -176,9 +176,17 @@ function bulkDelete(res) {
 module.exports = function(app, io) {
 
 	var _socket;
+	var users = 0;
 
 	io.on('connection', function(socket) {
+		users++;
+		io.emit('todos:userCount', users);
 		_socket = socket;
+
+		socket.on('disconnect', function() {
+			users--;
+			io.emit('todos:userCount', users);
+		});
 	});
 
 	app.get('/api/todos', function(req, res) {

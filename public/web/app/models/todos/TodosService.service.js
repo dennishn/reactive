@@ -17,29 +17,21 @@
 			create: create,
 			update: update,
 			remove: remove,
-			collection: []
+			collection: [],
+			activeUsers: 0
 		};
 
 		Socket.on('todos:pushSingle', function(todo) {
 			console.info('Recieving from Server - todos:pushSingle');
 
-			var keepGoing = true;
+			var i = _findIndexById(todo._id);
 
-			for(var i = 0, l = service.collection.length; i < l; i++) {
-				if(keepGoing) {
-					if(service.collection[i]._id === todo._id) {
-						console.info('Record found - updating');
-						service.collection[i] = todo;
-						keepGoing = false;
-					}
-				}
-
-			}
-
-			if(keepGoing) {
-				console.info('Record not found - pushing to collection');
+			if(i > -1) {
+				service.collection[i].update(todo);
+			} else {
 				service.collection.push(todo);
 			}
+
 		});
 
 		Socket.on('todos:pushList', function(todos) {
@@ -51,24 +43,40 @@
 		Socket.on('todos:retractSingle', function(id) {
 			console.info('Recieving from Server - todos:retractSingle');
 
-			for(var i = 0, l = service.collection.length; i < l; i++) {
-				if(service.collection[i]._id === id) {
-					console.info('Record found - updating');
-					service.collection.splice(i, 1);
-				}
+			var i = _findIndexById(id);
+
+			if(i > -1) {
+				service.collection.splice(i, 1);
 			}
 
+		});
+
+		Socket.on('todos:userCount', function(count) {
+			service.activeUsers = count;
 		});
 
 		return service;
 
 		function getList() {
+			console.info('HTTP Query from Server - /todos');
 
 			var deferred = $q.defer();
 
 			$http.get(baseUrl)
 				.then(function getTodosListSuccess(results) {
-					service.collection = results.data;
+
+					var i = 0,
+						l = results.data.length;
+
+					var _todos = [];
+
+					for(; i < l; i++) {
+						var todo = new TodoFactory(results.data[i]);
+						_todos.push(todo);
+					}
+
+					service.collection = _todos;
+
 					deferred.resolve(service.collection);
 				})
 				.catch(function getTodosListError(err) {
@@ -80,12 +88,25 @@
 		}
 
 		function getSingle(id) {
+			console.info('HTTP Query from Server - /todos/:id');
 
 			var deferred = $q.defer();
 
 			$http.get(baseUrl + '/' + id)
 				.then(function getTodoSuccess(result) {
-					deferred.resolve(result.data);
+
+					var i = _findIndexById(result.data._id);
+
+					var todo;
+
+					if(i > -1) {
+						todo = service.collection[i];
+					} else {
+						todo = new TodoFactory(result.data);
+						service.collection.push(todo);
+					}
+
+					deferred.resolve(todo);
 				})
 				.catch(function getTodoError(err) {
 					deferred.reject(err);
@@ -96,12 +117,17 @@
 		}
 
 		function create(todo) {
+			console.info('HTTP Post to Server - /todos');
 
 			var deferred = $q.defer();
 
 			$http.post(baseUrl, todo)
 				.then(function createTodoSuccess(result) {
-					deferred.resolve(result.data);
+
+					var _todo = new TodoFactory(result.data);
+					service.collection.push(_todo);
+
+					deferred.resolve('');
 				})
 				.catch(function createTodoError(err) {
 					deferred.reject(err);
@@ -112,14 +138,22 @@
 		}
 
 		function update(todo) {
+			console.info('HTTP Post to Server - /todos/:id');
 
 			var deferred = $q.defer();
 
 			$http.put(baseUrl + '/' + todo._id, todo)
-				.then(function createTodoSuccess(result) {
-					deferred.resolve(result.data);
+				.then(function updateTodoSuccess(result) {
+
+					var i = _findIndexById(todo._id);
+
+					if(i > -1) {
+						service.collection[i].update(todo);
+					}
+
+					deferred.resolve('');
 				})
-				.catch(function createTodoError(err) {
+				.catch(function updateTodoError(err) {
 					deferred.reject(err);
 				});
 
@@ -128,6 +162,7 @@
 		}
 
 		function remove(id) {
+			console.info('HTTP Delete to Server - /todos/:id');
 
 			var deferred = $q.defer();
 
@@ -143,8 +178,11 @@
 
 		}
 
-		function _findById(id) {
+		function _findIndexById(id) {
 
+			return lodash.findIndex(service.collection, function(t) {
+				return t._id === id;
+			});
 		}
 	}
 
